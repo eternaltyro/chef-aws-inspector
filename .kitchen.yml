@@ -1,6 +1,12 @@
 ---
 driver:
-  name: vagrant
+  name: ec2
+  availability_zone: a
+  aws_ssh_key_id: ssh_key # update as needed
+  instance_type: m3.medium
+  interface: public
+  region: us-east-1
+  require_chef_omnibus: true
 
 provisioner:
   name: chef_zero
@@ -9,13 +15,31 @@ provisioner:
   #   always_update_cookbooks: <%= !ENV['CI'] %>
   always_update_cookbooks: true
 
+transport:
+  ssh_key: 'ssh_key.pem' # needs to be updated to match aws_ssh_key_id above
+
 verifier:
   name: inspec
 
 platforms:
   - name: ubuntu-14.04
+    driver:
+      image_id: ami-49c9295f
+    transport:
+      username: ubuntu
   - name: ubuntu-16.04
+    driver:
+      image_id: ami-6edd3078
+    transport:
+      username: ubuntu
   - name: centos-7.2
+    driver:
+      image_id: ami-6d1c2007
+    transport:
+      username: centos
+    run_list:
+      - recipe[sudo]
+    attributes: { authorization: { sudo: { include_sudoers_d: true, passwordless: true, sudoers_defaults: ['!requiretty'], users: ['centos'] } } }
 
 suites:
   - name: default
@@ -24,4 +48,3 @@ suites:
     verifier:
       inspec_tests:
         - test/recipes
-    attributes:
