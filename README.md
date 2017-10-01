@@ -51,12 +51,14 @@ Foodcritic:
     ```
 
 Kitchen:
-- Use Kitchen to test the cookbook against a real system. Preferably a
-  vagrant machine with Ubuntu or CentOS.
+- Use Kitchen to test the cookbook against a real system. Preferably an
+  instance machine with Ubuntu or CentOS. Note that in `kitchen.yml`, it
+  is necessary to edit `aws_ssh_key_id` and `ssh_key` to point to an SSH
+  key pair in your account.
 
     ```
-    $ sudo gem install test-kitchen kitchen-vagrant
-    $ kitchen init
+    $ bundle install
+    $ kitchen test
     ```
 
 TODO: Unit tests using RSpec and ChefSpec

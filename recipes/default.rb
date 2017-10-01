@@ -24,6 +24,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+##
+# Remove the AWS inspector package from the system if it's already
+# installed
+#
+package 'awsagent' do
+  case node[:platform]
+  when 'redhat', 'centos', 'amazon'
+    package_name 'AwsAgent'
+  when 'debian', 'ubuntu'
+    package_name 'awsagent'
+  end
+  action   :remove
+  notifies :stop, 'service[awsagent]', :immediately
+  not_if   { node.normal[:inspector][:enabled] }
+end
+
 package 'gnupg2' # Used for cryptographic verification later on
 
 ##
@@ -78,22 +94,6 @@ execute 'install-inspector' do
   only_if { node.normal[:inspector][:enabled] }
   not_if do ::File.exist?('/opt/aws/awsagent/bin/awsagent') end
   notifies :start, "service[awsagent]", :immediately
-end
-
-##
-# Remove the AWS inspector package from the system if it's already
-# installed
-#
-package 'awsagent' do
-  case node[:platform]
-  when 'redhat', 'centos', 'amazon'
-    package_name 'AwsAgent'
-  when 'debian', 'ubuntu'
-    package_name 'awsagent'
-  end
-  action   :remove
-  notifies :stop, 'service[awsagent]', :immediately
-  not_if   { node.normal[:inspector][:enabled] }
 end
 
 ##
