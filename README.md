@@ -59,6 +59,21 @@ Kitchen:
     ```
     $ bundle install
     $ kitchen test
+    # =======
+    $ sudo gem install test-kitchen kitchen-vagrant
+    $ kitchen init
+    $ kitchen diagnose --all
+    ```
+
+- Running converge
+    ```
+    $ kitchen converge default-ubuntu-1404
+    ```
+
+- I use `zsh` inplace of `bash`. I had to do this to make kitchen work:
+
+    ```
+    $ eval "$(chef shell-init zsh)"
     ```
 
 TODO: Unit tests using RSpec and ChefSpec

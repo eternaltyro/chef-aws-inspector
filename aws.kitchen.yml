@@ -1,0 +1,27 @@
+driver:
+  name: ec2
+  aws_ssh_key_id: US-East1
+  transport.ssh_key: ../ec2_keys/US-East1.pem
+  region: us-east-1
+  availability_zone: us-east-1c
+  require_chef_omnibus: true
+  security_group_ids: sg........
+  subnet_id: subnet-.........
+  associate_public_ip: true
+  interface: dns
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  name: amazon
+  driver:
+    image_id: ami-xxxxxxxx
+  transport:
+    username: ec2-user
+
+suites:
+  - name: default
+    run_list:
+      - recipe[createdir-ec2::default]
+    attributes:
