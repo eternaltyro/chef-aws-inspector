@@ -37,7 +37,7 @@ package 'awsagent' do
   end
   action   :remove
   notifies :stop, 'service[awsagent]', :immediately
-  not_if   { node.normal[:inspector][:enabled] }
+  not_if   { node[:inspector][:enabled] }
 end
 
 package 'gnupg2' # Used for cryptographic verification later on
@@ -46,11 +46,11 @@ package 'gnupg2' # Used for cryptographic verification later on
 # Download and GPG verification key for AWS inspector binary
 #
 remote_file "#{Chef::Config[:file_cache_path]}/inspector.gpg" do
-  source              node.default[:inspector][:gpgkey_url]
+  source              node[:inspector][:gpgkey_url]
   use_conditional_get true
   mode                0440
   action              :create
-  only_if             { node.normal[:inspector][:enabled] }
+  only_if             { node[:inspector][:enabled] }
   notifies            :run, 'execute[import_key]', :immediately
 end
 
@@ -68,9 +68,9 @@ end
 remote_file "#{Chef::Config[:file_cache_path]}/install.sig" do
   source              node.default[:inspector][:gpg_signature_url]
   use_conditional_get true
-  mode                0440
+  mode                0o440
   action              :create_if_missing
-  only_if             { node.normal[:inspector][:enabled] }
+  only_if             { node[:inspector][:enabled] }
 end
 
 ##
@@ -79,9 +79,9 @@ end
 remote_file "#{Chef::Config[:file_cache_path]}/inspector" do
   source              node.default[:inspector][:installer_url]
   use_conditional_get true
-  mode                0440
+  mode                0o440
   action              :create
-  only_if             { node.normal[:inspector][:enabled] }
+  only_if             { node[:inspector][:enabled] }
 end
 
 ##
@@ -92,8 +92,8 @@ execute 'install-inspector' do
   command "bash #{Chef::Config[:file_cache_path]}/inspector -u false"
   only_if "/usr/bin/gpg2 --verify #{Chef::Config[:file_cache_path]}/install.sig #{Chef::Config[:file_cache_path]}/inspector"
   only_if { node.normal[:inspector][:enabled] }
-  not_if do ::File.exist?('/opt/aws/awsagent/bin/awsagent') end
-  notifies :start, "service[awsagent]", :immediately
+  not_if { ::File.exist?('/opt/aws/awsagent/bin/awsagent') }
+  notifies :start, 'service[awsagent]', :immediately
 end
 
 ##
