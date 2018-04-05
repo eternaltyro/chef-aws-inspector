@@ -40,7 +40,10 @@ package 'awsagent' do
   not_if   { node[:inspector][:enabled] }
 end
 
-package 'gnupg2' # Used for cryptographic verification later on
+package 'gnupg2' do # Used for cryptographic verification later on
+  action :install
+  not_if { platform?('windows') }
+end
 
 ##
 # Download and GPG verification key for AWS inspector binary
@@ -51,6 +54,7 @@ remote_file "#{Chef::Config[:file_cache_path]}/inspector.gpg" do
   mode                0440
   action              :create
   only_if             { node[:inspector][:enabled] }
+  not_if              { platform?('windows') }
   notifies            :run, 'execute[import_key]', :immediately
 end
 
@@ -60,6 +64,7 @@ end
 execute 'import_key' do
   command "gpg2 --import #{Chef::Config[:file_cache_path]}/inspector.gpg"
   action :nothing
+  not_if { platform?('windows') }
 end
 
 ##
@@ -71,6 +76,7 @@ remote_file "#{Chef::Config[:file_cache_path]}/install.sig" do
   mode                0o440
   action              :create_if_missing
   only_if             { node[:inspector][:enabled] }
+  not_if              { platform?('windows') }
 end
 
 ##
@@ -82,6 +88,7 @@ remote_file "#{Chef::Config[:file_cache_path]}/inspector" do
   mode                0o440
   action              :create
   only_if             { node[:inspector][:enabled] }
+  not_if              { platform?('windows') }
 end
 
 ##
@@ -93,7 +100,16 @@ execute 'install-inspector' do
   only_if "/usr/bin/gpg2 --verify #{Chef::Config[:file_cache_path]}/install.sig #{Chef::Config[:file_cache_path]}/inspector"
   only_if { node.normal[:inspector][:enabled] }
   not_if { ::File.exist?('/opt/aws/awsagent/bin/awsagent') }
+  not_if { platform?('windows') }
   notifies :start, 'service[awsagent]', :immediately
+end
+
+# Install for Windows
+windows_package 'awsagent' do
+  source node[:inspector][:win_installer_url]
+  installer_type :custom
+  options '-silent'
+  only_if { platform?('windows') }
 end
 
 ##
@@ -103,4 +119,15 @@ service 'awsagent' do
   supports :start => true, :stop => true, :status => true
   status_command '/opt/aws/awsagent/bin/awsagent status'
   action :nothing
+  not_if { platform?('windows') }
+end
+
+windows_service 'AWSAgent' do
+  action [:enable, :start]
+  only_if { platform?('windows') }
+end
+
+windows_service 'AWSAgentUpdater' do
+  action [:enable, :start]
+  only_if { platform?('windows') }
 end
