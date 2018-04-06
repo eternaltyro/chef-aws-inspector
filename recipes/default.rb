@@ -127,7 +127,7 @@ windows_service 'AWSAgent' do
   only_if { platform?('windows') }
 end
 
-windows_service 'AWSAgentUpdater' do
+windows_service 'AWSAgentUpdater' do  # AWS Agent Updater service for Windows
   action [:enable, :start]
   only_if { platform?('windows') }
 end
