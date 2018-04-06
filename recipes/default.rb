@@ -40,7 +40,6 @@ package 'awsagent' do
   not_if   { node[:inspector][:enabled] }
 end
 
-
 package 'gnupg2' do # Used for cryptographic verification later on
   action :install
   not_if { platform?('windows') }
@@ -106,8 +105,10 @@ execute 'install-inspector' do
 end
 
 # Install for Windows
-package 'awsagent' do
-  source 'https://d1wk0tztpsntt1.cloudfront.net/windows/installer/latest/AWSAgentInstall.exe'
+windows_package 'awsagent' do
+  source node[:inspector][:win_installer_url]
+  installer_type :custom
+  options '-silent'
   only_if { platform?('windows') }
 end
 
@@ -121,12 +122,12 @@ service 'awsagent' do
   not_if { platform?('windows') }
 end
 
-windows_service 'AWS Agent Service' do
+windows_service 'AWSAgent' do
   action [:enable, :start]
   only_if { platform?('windows') }
 end
 
-windows_service 'AWS Agent Updater Service' do
+windows_service 'AWSAgentUpdater' do  # AWS Agent Updater service for Windows
   action [:enable, :start]
   only_if { platform?('windows') }
 end
