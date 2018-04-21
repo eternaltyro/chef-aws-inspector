@@ -105,11 +105,12 @@ execute 'install-inspector' do
 end
 
 # Install for Windows
-windows_package 'awsagent' do
-  source node[:inspector][:win_installer_url]
-  installer_type :custom
-  options '-silent'
-  only_if { platform?('windows') }
+if platform?('windows')
+  windows_package 'awsagent' do
+    source node[:inspector][:win_installer_url]
+    installer_type :custom
+    options '-silent'
+  end
 end
 
 ##
@@ -122,12 +123,12 @@ service 'awsagent' do
   not_if { platform?('windows') }
 end
 
-windows_service 'AWSAgent' do
-  action [:enable, :start]
-  only_if { platform?('windows') }
-end
+if platform?('windows')
+  windows_service 'AWSAgent' do
+    action [:enable, :start]
+  end
 
-windows_service 'AWSAgentUpdater' do  # AWS Agent Updater service for Windows
-  action [:enable, :start]
-  only_if { platform?('windows') }
+  windows_service 'AWSAgentUpdater' do
+    action [:enable, :start]
+  end
 end
