@@ -31,7 +31,7 @@ file and it will be removed.
 - Ubuntu
 - CentOS 7
 - Amazon Linux
-- Microsoft Windows
+- Microsoft Windows 2008 R2 or higher
 
 ## Depends
 
