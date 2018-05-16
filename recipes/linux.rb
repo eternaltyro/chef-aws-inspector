@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-inspector
-# Recipe:: default
+# Recipe:: linux
 #
 # The MIT License (MIT)
 #
