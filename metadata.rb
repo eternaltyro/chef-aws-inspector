@@ -23,3 +23,5 @@ supports 'redhat'
 supports 'centos', '~> 6.5'
 supports 'amazon', '~> 2015.09'
 supports 'windows'
+
+depends 'windows'
