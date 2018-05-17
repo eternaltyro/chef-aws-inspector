@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-inspector
-# Recipe:: default
+# Recipe:: windows
 #
 # The MIT License (MIT)
 #
@@ -24,11 +24,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-case node['os']
-when 'linux'
-  include_recipe 'aws-inspector::linux'
-when 'windows'
-  include_recipe 'aws-inspector::windows'
-else
-  raise
+# Install for Windows
+windows_package 'awsagent' do
+  source node[:inspector][:win_installer_url]
+  installer_type :custom
+  options '-silent'
+  only_if { platform?('windows') }
+end
+
+##
+# AWS inspector service
+#
+windows_service 'AWSAgent' do
+  action [:enable, :start]
+  only_if { platform?('windows') }
+end
+
+windows_service 'AWSAgentUpdater' do  # AWS Agent Updater service for Windows
+  action [:enable, :start]
+  only_if { platform?('windows') }
 end
