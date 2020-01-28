@@ -116,6 +116,7 @@ end
 # AWS inspector service
 #
 service 'awsagent' do
+  provider Chef::Provider::Service::Systemd if platform?('ubuntu') && node['platform_version'].to_f >= 18
   supports :start => true, :stop => true, :status => true
   status_command '/opt/aws/awsagent/bin/awsagent status'
   action :nothing
